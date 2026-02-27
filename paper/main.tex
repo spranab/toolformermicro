@@ -37,7 +37,7 @@
 
 % ===========================================================================
 \begin{abstract}
-Tool-augmented large language models (LLMs) include full JSON tool schemas in every prompt, consuming thousands of tokens on context that rarely changes between requests. We present \textbf{ToolFormerMicro}, a small encoder-decoder model (${\sim}428$M parameters, ${<}1$\,GB) that compresses each tool schema independently into $K{=}8$ fixed-size gist vectors via Perceiver-style cross-attention pooling. A query decoder consumes these gist vectors through \emph{gated cross-attention}---where a learned $\tanh$ gate initialized to zero prevents randomly-initialized cross-attention layers from corrupting pre-trained decoder states. Tools are encoded independently and their gists are simply concatenated, enabling true composability: adding or removing a tool requires re-encoding only that tool (${\sim}40$\,ms) with no effect on other tools' cached representations. We evaluate on three tool-calling benchmarks (seen, held-out, and unseen tools) and demonstrate: (1)~Tool Selection Accuracy of 0.818 with zero false positives across all splits; (2)~perfect order independence ($\Delta$TSA$\,{=}\,0.000$); (3)~constant accuracy from 5 to 200 tools with sub-linear encoding cost; and (4)~bit-identical gist stability under single-tool hot-swap. Each tool's gist cache is 14\,KB, enabling deployment on resource-constrained devices.
+Tool-augmented large language models (LLMs) include full JSON tool schemas in every prompt, consuming thousands of tokens on context that rarely changes between requests. This paper presents \textbf{ToolFormerMicro}, a small encoder-decoder model (${\sim}428$M parameters, ${<}1$\,GB) that compresses each tool schema independently into $K{=}8$ fixed-size gist vectors via Perceiver-style cross-attention pooling. A query decoder consumes these gist vectors through \emph{gated cross-attention}---where a learned $\tanh$ gate initialized to zero prevents randomly-initialized cross-attention layers from corrupting pre-trained decoder states. Tools are encoded independently and their gists are simply concatenated, enabling true composability: adding or removing a tool requires re-encoding only that tool (${\sim}40$\,ms) with no effect on other tools' cached representations. Evaluation on three tool-calling benchmarks (seen, held-out, and unseen tools) demonstrates: (1)~Tool Selection Accuracy of 0.818 with zero false positives across all splits; (2)~perfect order independence ($\Delta$TSA$\,{=}\,0.000$); (3)~constant accuracy from 5 to 200 tools with sub-linear encoding cost; and (4)~bit-identical gist stability under single-tool hot-swap. Each tool's gist cache is 14\,KB, enabling deployment on resource-constrained devices.
 \end{abstract}
 
 % ===========================================================================
@@ -48,7 +48,7 @@ Tool-augmented LLMs have become central to agentic AI systems, enabling models t
 
 This redundancy has two costs. First, \textbf{latency}: prefilling thousands of tool-schema tokens dominates time-to-first-token (TTFT), with measurements showing 787\,ms for 20 tools on Qwen3-8B versus 114\,ms for the user query alone~\citep[companion paper]{contextcache2026}. Second, \textbf{composability}: existing solutions like prefix caching~\citep{kwon2023vllm,zheng2024sglang} cache the entire tool set as a single prefix, so adding or removing one tool invalidates the entire cache.
 
-We propose \textbf{ToolFormerMicro}, a small encoder-decoder architecture that addresses both problems simultaneously. Each tool schema is encoded independently into $K{=}8$ gist vectors (14\,KB per tool). The decoder attends to the concatenated gist vectors of all active tools via cross-attention. This design yields three composability properties that we verify empirically:
+This paper proposes \textbf{ToolFormerMicro}, a small encoder-decoder architecture that addresses both problems simultaneously. Each tool schema is encoded independently into $K{=}8$ gist vectors (14\,KB per tool). The decoder attends to the concatenated gist vectors of all active tools via cross-attention. This design yields three composability properties verified empirically:
 
 \begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=1pt]
 \item \textbf{Order independence}: Shuffling the order of tool gists produces identical outputs ($\Delta$TSA$\,{=}\,0.000$).
@@ -103,9 +103,9 @@ Each decoder layer follows the structure:
 \end{align}
 where $g_l$ is a learnable scalar per layer (initialized to 0), $\text{LN}$ is RMSNorm, and $\mathbf{M} = [\mathbf{m}_1; \mathbf{m}_2; \ldots; \mathbf{m}_N]$ is the concatenated gist memory from $N$ tools, each contributing $K{=}8$ vectors.
 
-\paragraph{Why gating is necessary.} When adding randomly-initialized cross-attention layers to a pre-trained decoder, the random key/value projections produce essentially noise-like outputs. These corrupt the pre-trained hidden states from the very first training step. We observed that without gating, training loss plateaus at ${\sim}15$ for the first 2,500 steps before slowly recovering to ${\sim}5.0$. With $\tanh$ gating initialized to zero, training converges smoothly, reaching loss ${\sim}3.7$ at the same training budget.
+\paragraph{Why gating is necessary.} When adding randomly-initialized cross-attention layers to a pre-trained decoder, the random key/value projections produce essentially noise-like outputs. These corrupt the pre-trained hidden states from the very first training step. Empirically, without gating, training loss plateaus at ${\sim}15$ for the first 2,500 steps before slowly recovering to ${\sim}5.0$. With $\tanh$ gating initialized to zero, training converges smoothly, reaching loss ${\sim}3.7$ at the same training budget.
 
-This mechanism is inspired by Flamingo~\citep{alayrac2022flamingo}, which uses a similar $\tanh$ gate when injecting visual information into a frozen language model. Our contribution is applying it to tool schema conditioning and demonstrating its necessity for stable pre-trained weight transfer in a fully fine-tuned (not frozen) decoder.
+This mechanism is inspired by Flamingo~\citep{alayrac2022flamingo}, which uses a similar $\tanh$ gate when injecting visual information into a frozen language model. The contribution here is applying it to tool schema conditioning and demonstrating its necessity for stable pre-trained weight transfer in a fully fine-tuned (not frozen) decoder.
 
 \subsection{Gist Pooling}
 
@@ -121,7 +121,7 @@ where $\mathbf{E}_i$ is the encoder output for tool $i$. Each tool produces $K$ 
 \subsection{Training Curriculum}
 \label{sec:training}
 
-We train in three stages with increasing task complexity:
+Training proceeds in three stages with increasing task complexity:
 
 \paragraph{Stage 1: Schema Auto-Encoding (3K steps).}
 The encoder-decoder learns to reconstruct tool schemas from their gist representations. Given a schema $s_i$, we encode it to gists $\mathbf{m}_i$, then train the decoder to generate $s_i$ auto-regressively from $\mathbf{m}_i$ alone. This teaches the encoder to produce informative gist vectors and forces the gated cross-attention to open (gates must become nonzero for reconstruction). Learning rate: $2 \times 10^{-4}$, batch size: 8.
@@ -209,16 +209,16 @@ Cache Hot-Swap & TSA delta & 0.000 (re-encode: 40ms) \\
 \end{tabular}
 \end{table}
 
-We design three experiments to verify composability properties (\Cref{tab:composability}):
+Three experiments verify the composability properties (\Cref{tab:composability}):
 
 \paragraph{Experiment 1: Order Independence.}
-We run 50 examples with tools in their standard catalog order (TSA=0.860) and again with tools randomly shuffled (TSA=0.860). The delta is exactly zero, confirming that the decoder's cross-attention is permutation-invariant over gist vectors.
+50 examples are run with tools in their standard catalog order (TSA=0.860) and again with tools randomly shuffled (TSA=0.860). The delta is exactly zero, confirming that the decoder's cross-attention is permutation-invariant over gist vectors.
 
 \paragraph{Experiment 2: Scaling.}
-We vary the number of tools from 5 to 200 (\Cref{fig:scaling}). TSA remains constant at 0.800 across all tool counts. Per-tool encoding cost decreases from 5.35\,ms (5 tools) to 0.35\,ms (200 tools) due to GPU batching efficiency. The cross-attention over $NK$ gist tokens ($K{=}8$) at $N{=}200$ processes 1,600 tokens---still well within the model's capacity.
+The number of tools is varied from 5 to 200 (\Cref{fig:scaling}). TSA remains constant at 0.800 across all tool counts. Per-tool encoding cost decreases from 5.35\,ms (5 tools) to 0.35\,ms (200 tools) due to GPU batching efficiency. The cross-attention over $NK$ gist tokens ($K{=}8$) at $N{=}200$ processes 1,600 tokens---still well within the model's capacity.
 
 \paragraph{Experiment 3: Hot-Swap Cache Invalidation.}
-We cache gist vectors for 20 tools, then replace one tool's schema with a modified version. After re-encoding only the modified tool (39.8\,ms), we verify: (a)~all 19 other tools' gist vectors are bit-identical to before the swap; (b)~TSA is unchanged (0.800 before and after). This confirms that tool gists are truly independent.
+Gist vectors for 20 tools are cached, then one tool's schema is replaced with a modified version. After re-encoding only the modified tool (39.8\,ms), verification confirms: (a)~all 19 other tools' gist vectors are bit-identical to before the swap; (b)~TSA is unchanged (0.800 before and after). This confirms that tool gists are truly independent.
 
 \begin{figure}[t]
   \centering
@@ -274,7 +274,7 @@ ContextCache (Qwen3-8B) achieves higher TSA (0.850 vs.\ 0.818) with full tool sc
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented ToolFormerMicro, a ${\sim}428$M parameter encoder-decoder that compresses tool schemas into composable gist vectors via gated cross-attention. The three verified composability properties---order independence, sub-linear scaling to 200 tools, and bit-identical hot-swap---demonstrate that tool representations can be truly modular. At 14\,KB per tool and $<$1\,GB model size, ToolFormerMicro enables tool-calling on resource-constrained devices.
+This paper presented ToolFormerMicro, a ${\sim}428$M parameter encoder-decoder that compresses tool schemas into composable gist vectors via gated cross-attention. The three verified composability properties---order independence, sub-linear scaling to 200 tools, and bit-identical hot-swap---demonstrate that tool representations can be truly modular. At 14\,KB per tool and $<$1\,GB model size, ToolFormerMicro enables tool-calling on resource-constrained devices.
 
 The key technical insight is that $\tanh$-gated cross-attention, initialized to zero, enables stable fine-tuning when grafting new cross-attention layers onto pre-trained decoder weights. This mechanism may be broadly useful for any setting where pre-trained models need to be conditioned on new modalities.
 
