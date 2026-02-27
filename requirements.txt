@@ -1,0 +1,7 @@
+torch>=2.1.0
+transformers>=4.40.0
+datasets>=2.14.0
+pyyaml>=6.0
+matplotlib>=3.7.0
+safetensors>=0.4.0
+accelerate>=0.25.0
