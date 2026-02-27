@@ -1,0 +1,54 @@
+{
+  "experiment": "scaling_curves",
+  "gist_bytes_per_tool": 14336,
+  "results": [
+    {
+      "num_tools": 5,
+      "tsa": 0.8,
+      "avg_encode_ms": 26.72780000139028,
+      "per_tool_encode_ms": 5.345560000278056,
+      "avg_generate_ms": 945.7247050013393,
+      "num_examples": 20
+    },
+    {
+      "num_tools": 10,
+      "tsa": 0.8,
+      "avg_encode_ms": 14.708479998807888,
+      "per_tool_encode_ms": 1.4708479998807888,
+      "avg_generate_ms": 920.8501749992138,
+      "num_examples": 20
+    },
+    {
+      "num_tools": 20,
+      "tsa": 0.8,
+      "avg_encode_ms": 17.413204999320442,
+      "per_tool_encode_ms": 0.8706602499660221,
+      "avg_generate_ms": 882.4917500016454,
+      "num_examples": 20
+    },
+    {
+      "num_tools": 50,
+      "tsa": 0.8,
+      "avg_encode_ms": 25.506000001041684,
+      "per_tool_encode_ms": 0.5101200000208337,
+      "avg_generate_ms": 882.6493649998156,
+      "num_examples": 20
+    },
+    {
+      "num_tools": 100,
+      "tsa": 0.8,
+      "avg_encode_ms": 40.52432999887969,
+      "per_tool_encode_ms": 0.40524329998879693,
+      "avg_generate_ms": 1013.6364649995812,
+      "num_examples": 20
+    },
+    {
+      "num_tools": 200,
+      "tsa": 0.8,
+      "avg_encode_ms": 70.06633000273723,
+      "per_tool_encode_ms": 0.35033165001368616,
+      "avg_generate_ms": 1128.12235500096,
+      "num_examples": 20
+    }
+  ]
+}

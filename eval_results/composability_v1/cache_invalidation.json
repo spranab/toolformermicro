@@ -1,0 +1,14 @@
+{
+  "experiment": "cache_invalidation",
+  "num_tools": 20,
+  "modified_tool_idx": 0,
+  "other_tools_bitidentical": true,
+  "modified_tool_changed": true,
+  "modified_tool_cosine_sim": 0.3257318139076233,
+  "hotswap_encode_ms": 39.782399995601736,
+  "tsa_original": 0.8,
+  "tsa_swapped": 0.8,
+  "tsa_delta": 0.0,
+  "routing_stable": true,
+  "num_test_queries": 20
+}

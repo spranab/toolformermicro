@@ -1,0 +1,66 @@
+# ToolFormerMicro configuration
+# ~420M params encoder-decoder with cross-attention for composable tool calling
+
+model:
+  vocab_size: 151936
+  hidden_size: 896
+  intermediate_size: 4864
+  num_encoder_layers: 6
+  num_decoder_layers: 12
+  num_attention_heads: 14
+  num_kv_heads: 2
+  head_dim: 64
+  max_position_embeddings: 32768
+  rope_theta: 1000000.0
+  rms_norm_eps: 1.0e-6
+  tie_word_embeddings: true
+
+gisting:
+  num_gist_tokens: 8
+  num_context_tools: 20
+  max_schema_tokens: 256
+
+init:
+  pretrained_model: "Qwen/Qwen2.5-0.5B"
+  encoder_layer_offset: 0
+  decoder_layer_offset: 6
+
+stage1:
+  stage1_steps: 3000
+  stage1_lr: 2.0e-4
+  stage1_batch_size: 8
+  stage1_warmup_steps: 100
+
+stage1_5:
+  stage1_5_steps: 2000
+  stage1_5_lr: 1.0e-4
+  stage1_5_batch_size: 8
+  stage1_5_warmup_steps: 100
+  stage1_5_temperature: 0.07
+  stage1_5_hard_negatives: 7
+  stage1_5_schema_ae_lambda: 0.1
+
+stage2:
+  stage2_epochs: 3
+  stage2_lr: 1.0e-4
+  stage2_batch_size: 2
+  stage2_gradient_accumulation: 8
+  stage2_warmup_ratio: 0.05
+  schema_ae_lambda: 0.1
+  schema_ae_freq: 0.05
+  contrastive_lambda: 0.1
+
+training:
+  max_seq_length: 2048
+  max_grad_norm: 1.0
+  bf16: true
+  gradient_checkpointing: true
+  seed: 42
+
+logging:
+  logging_steps: 10
+  save_steps: 500
+  eval_steps: 500
+
+output:
+  output_dir: "checkpoints/tool_former"

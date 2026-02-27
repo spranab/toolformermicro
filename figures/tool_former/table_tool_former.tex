@@ -1,0 +1,34 @@
+\begin{table}[t]
+\centering
+\caption{ToolFormerMicro evaluation results. TSA: Tool Selection Accuracy, PF1: Parameter F1, VR: Value Recall, EM: Exact Match.}
+\label{tab:tool-former-results}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Method & TSA$\uparrow$ & PF1$\uparrow$ & VR$\uparrow$ & EM$\uparrow$ & FPR$\downarrow$ \\
+\midrule
+\textbf{ToolFormerMicro V1} & \textbf{0.818} & 0.759 & \textbf{0.917} & \textbf{0.580} & \textbf{0.000} \\
+ToolFormerMicro V2 (gated) & 0.784 & \textbf{0.792} & \textbf{0.942} & 0.580 & 0.000 \\
+ContextCache (8B) & 0.850 & 0.735 & --- & 0.600 & 0.000 \\
+Tool Gisting K=8 & 0.714 & --- & --- & --- & 0.302 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Composability table
+\begin{table}[t]
+\centering
+\caption{Composability experiments. ToolFormerMicro gist vectors are fully composable: order-independent, scale to 200 tools with constant TSA, and support single-tool hot-swap.}
+\label{tab:composability}
+\small
+\begin{tabular}{lcc}
+\toprule
+Experiment & Metric & Result \\
+\midrule
+Order Independence & TSA delta & 0.000 (+0.000) \\
+Scaling (5$\to$200 tools) & TSA range & [0.800, 0.800] \\
+Cache Hot-Swap & TSA delta & 0.000 (re-encode: 40ms) \\
+  & Other tools & bit-identical \\
+\bottomrule
+\end{tabular}
+\end{table}

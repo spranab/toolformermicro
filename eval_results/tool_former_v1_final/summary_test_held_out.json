@@ -1,0 +1,15 @@
+{
+  "num_examples": 50,
+  "num_tool_calls": 7,
+  "num_non_tool": 43,
+  "tool_selection_accuracy": 0.7142857142857143,
+  "parameter_f1": 0.4,
+  "exact_match": 0.0,
+  "false_positive_rate": 0.27906976744186046,
+  "false_negative_rate": 0.2857142857142857,
+  "correct_tool": 5,
+  "false_positives": 12,
+  "false_negatives": 2,
+  "avg_encode_ms": 19.759526000416372,
+  "avg_generate_ms": 4094.8013000001083
+}

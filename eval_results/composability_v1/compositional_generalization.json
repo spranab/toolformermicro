@@ -1,0 +1,8 @@
+{
+  "experiment": "compositional_generalization",
+  "num_examples": 50,
+  "tsa_standard": 0.86,
+  "tsa_shuffled": 0.86,
+  "delta": 0.0,
+  "order_independent": true
+}
